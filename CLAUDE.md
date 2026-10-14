@@ -16,8 +16,8 @@ its only runtime dependency. It started from the official JavaScript template.
 ```bash
 npm install
 npm test                                  # node --test, the built-in runner
-node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test test/hub.test.js              # one file
+node --test --test-name-pattern "vacation" # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
@@ -32,15 +32,20 @@ pushing.
 
 ```
 index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
+src/app.js                        registers every SDK handler on the hub (shared with the tests)
+src/hub.js                        timer, readings, transitions (scene events), commands, statuses
+src/devices.js                    one Gladys device per module: features, names, states
+src/heatzy/model.js               product keys, generations, mode codes, control payloads
+src/heatzy/client.js              Gizwits client (login, bindings, devdata, control), error kinds
+src/heatzy/http.js                the only network access (fetch + timeout)
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+src/widgets.js                    `radiators` widget (manifest `widgets`)
+src/texts.js                      texts sent from the container, four languages
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (en and fr mandatory)
+test/                             node --test, against the SDK's fake Gladys and a simulated Gizwits cloud
+test/fixtures/heatzy/             real modules of the hass-heatzy tests, anonymized
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +75,9 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German ("du") and Spanish
+  ("usted"): action messages, widget texts, feature names, manifest texts, and
+  `docs/en.md` / `fr.md` / `de.md` / `es.md`, kept in sync (`test/i18n.test.js`).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -233,3 +239,29 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Heatzy (cette intégration)
+
+- **API** : cloud Gizwits de Heatzy, `https://euapi.gizwits.com/app/…`, en-tête
+  `X-Gizwits-Application-Id` (Application Id public de l'app Heatzy, celui de hass-heatzy) et
+  `X-Gizwits-User-Token` après `POST login`. `expire_at` est en **secondes**. Un jeton refusé répond
+  **HTTP 400** avec `error_code` 9004 (pas 401) : le client le renouvelle une fois. Mauvais
+  identifiants : 400 / 9020. `bindings` est **paginé** (`limit`, `skip`, 20 par défaut côté Gizwits) :
+  lire toutes les pages.
+- **Générations** (d'après hass-heatzy, MIT ; heatzypy est GPL-3 : n'en rien copier) : Pilote v1 en
+  codes chinois et trame brute `{ raw: [1, 1, n] }` ; v2/v3 : 4 modes (`cft`, `eco`, `fro`, `stop`) ;
+  v4, Pro, Glow/Onyx/Inea, Bloom : 6 modes (`cft1`, `cft2` en plus). Glow : l'arrêt est `on_off: 0`
+  (le mode est gardé). Pilote Pro : le mode appliqué se lit dans `cur_mode`. Bloom : température en
+  degrés entiers, pas de `lock_switch` dans la fixture réelle (pas de verrouillage publié).
+- **Cœur** : `heater/pilot-wire-mode` (entiers 0 off, 1 hors gel, 2 éco, 3 confort -1, 4 confort -2,
+  5 confort) a un sélecteur natif au tableau de bord, qui montre **toujours les 6 valeurs** : un
+  module à 4 modes refuse 3 et 4 avec un message. Ce couple n'est exposé ni à Alexa, ni à Google, ni à
+  HomeKit (vérifié dans la 5.2.0) ; `thermostat/target-temperature` l'est (HomeKit en fait un
+  thermostat) : c'est pourquoi les consignes ne sont pas publiées.
+- **Déclencheur `mode_changed`** : seulement pour un changement venu d'ailleurs que Gladys (fenêtre
+  de 3 min après une commande), pour éviter les boucles de scène.
+- **Piège payé ici** : `widgetChanged ||= await this.transitions(…)` saute les transitions dès qu'un
+  premier module a changé (évaluation paresseuse de `||=`) : deux déclencheurs dans la même lecture,
+  un seul publié. Ne jamais mettre d'effet de bord à droite d'un `||=`.
+- Mot de passe refusé : plus aucune lecture jusqu'à une nouvelle configuration ou « Tester la
+  connexion » (ne pas faire bloquer le compte). 429 / 9999 : pause de 10 min.

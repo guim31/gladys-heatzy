@@ -159,8 +159,7 @@ export function didOf(gladys, externalId) {
 }
 
 /** The name shown for a module: its name in the Heatzy app, else its model. */
-export const moduleName = (module) =>
-  module.name ?? `Heatzy ${module.productName ?? module.capabilities.model}`;
+export const moduleName = (module) => module.name ?? `Heatzy ${module.model}`;
 
 /**
  * The discovery payload of a module.
@@ -175,7 +174,7 @@ export function buildDevice(gladys, module, language = 'fr') {
     name: moduleName(module),
     external_id: ids.device,
     should_poll: false,
-    params: [{ name: 'MODEL', value: module.productName ?? module.capabilities.model }],
+    params: [{ name: 'MODEL', value: module.model }],
     features: FEATURES.filter(({ applies }) => applies(module.capabilities)).map(
       ({ key, definition }) => ({
         ...definition,

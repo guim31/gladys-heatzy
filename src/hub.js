@@ -279,7 +279,9 @@ export class HeatzyHub {
         };
       }
       next.ownChangeUntil = previous?.ownChangeUntil ?? 0;
-      widgetChanged ||= await this.transitions(previous, next);
+      // Not `||=`: the transitions (scene events) must run for every module.
+      const changed = await this.transitions(previous, next);
+      widgetChanged = widgetChanged || changed;
       this.modules.set(binding.did, next);
     }
     for (const did of [...this.modules.keys()]) {
@@ -614,7 +616,7 @@ export class HeatzyHub {
       const lines = [text.found(this.modules.size)];
       for (const module of this.modules.values()) {
         lines.push(
-          `- ${moduleName(module)} (${module.productName ?? module.capabilities.model})${module.online ? '' : `, ${text.offline}`}`,
+          `- ${moduleName(module)} (${module.model})${module.online ? '' : `, ${text.offline}`}`,
         );
       }
       message[language] = lines.join('\n');

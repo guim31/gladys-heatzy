@@ -138,19 +138,20 @@ export const GENERATIONS = {
   other: { model: 'Heatzy', modes: SIX_MODES, vacation: true, guessed: true },
 };
 
+// Product key → [generation, model name shown in Gladys].
 export const PRODUCT_KEYS = {
-  '9420ae048da545c88fc6274d204dd25f': 'pilote_v1',
-  '51d16c22a5f74280bc3cfe9ebcdc6402': 'pilote_v2', // Pilote 2
-  '4fc968a21e7243b390e9ede6f1c6465d': 'pilote_v2', // Pilote 2 Elec Pro
-  b9a67b6ce24b437d9794103fd317e627: 'pilote_v2', // Pilote SoC (v3)
-  b8c6657b66c34148b4dee64d615cefc7: 'pilote_v2', // Elec Pro SoC (v3)
-  '9dacde7ef459421eaf8dc4bea9385634': 'pilote_v4', // Elec Pro BLE
-  '46409c7f29d4411c85a3a46e5ee3703e': 'pilote_v4', // Pilote SoC C3 (also Sauter)
-  a77a929fcf0d4631bc4f669080376891: 'pilote_pro',
-  '2fd622e45283470f9e27e8e6167d7533': 'glow', // Glow Simple
-  bb10d064f8de409db633b750faa22a52: 'glow', // Onyx
-  fc89066ee74c4149a9beb37d4ea93604: 'glow', // Inea
-  '480253852d574f11b2d7fbf4460d7a41': 'bloom',
+  '9420ae048da545c88fc6274d204dd25f': ['pilote_v1', 'Pilote v1'],
+  '51d16c22a5f74280bc3cfe9ebcdc6402': ['pilote_v2', 'Pilote v2'],
+  '4fc968a21e7243b390e9ede6f1c6465d': ['pilote_v2', 'Pilote v2 Elec Pro'],
+  b9a67b6ce24b437d9794103fd317e627: ['pilote_v2', 'Pilote v3'],
+  b8c6657b66c34148b4dee64d615cefc7: ['pilote_v2', 'Pilote v3 Elec Pro'],
+  '9dacde7ef459421eaf8dc4bea9385634': ['pilote_v4', 'Pilote v4 Elec Pro'],
+  '46409c7f29d4411c85a3a46e5ee3703e': ['pilote_v4', 'Pilote v4'], // also sold by Sauter
+  a77a929fcf0d4631bc4f669080376891: ['pilote_pro', 'Pilote Pro'],
+  '2fd622e45283470f9e27e8e6167d7533': ['glow', 'Glow'],
+  bb10d064f8de409db633b750faa22a52: ['glow', 'Onyx'],
+  fc89066ee74c4149a9beb37d4ea93604: ['glow', 'Inea'],
+  '480253852d574f11b2d7fbf4460d7a41': ['bloom', 'Bloom'],
 };
 
 function isNumber(value) {
@@ -174,7 +175,7 @@ function flag(value) {
 
 /** The generation key of a module (`bindings` entry). */
 export function generationOf(binding) {
-  return PRODUCT_KEYS[binding?.product_key] ?? 'other';
+  return PRODUCT_KEYS[binding?.product_key]?.[0] ?? 'other';
 }
 
 /**
@@ -223,7 +224,11 @@ export function parseModule(binding, attrs) {
       typeof binding.dev_alias === 'string' && binding.dev_alias.trim()
         ? binding.dev_alias.trim()
         : null,
-    productName: binding.product_name ?? null,
+    model:
+      PRODUCT_KEYS[binding.product_key]?.[1] ??
+      (typeof binding.product_name === 'string' && binding.product_name
+        ? binding.product_name
+        : capabilities.model),
     generation,
     capabilities,
     online: binding.is_online !== false,

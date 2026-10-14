@@ -1,61 +1,150 @@
-# Demo Devices Template
+# Heatzy
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+Control your [Heatzy](https://heatzy.com) pilot wire modules from Gladys: the
+mode of each electric radiator (Comfort, Eco, Frost protection, Off, and
+Comfort -1°C / -2°C on the modules that have them), the vacation mode, the
+child lock and the weekly programme, plus the room temperature on the models
+that measure it. A dashboard widget switches every radiator at once, and
+scenes react when a radiator changes mode or a module goes offline.
 
-## What you get
+> **Developed without the hardware: feedback welcome.** This integration was
+> built and tested against a simulated Heatzy cloud fed with the real modules
+> of the hass-heatzy tests (Home Assistant), not with a real Heatzy account. If
+> something does not work as described, say so on the
+> [Gladys forum](https://community.gladysassistant.com) or in the
+> [issues](https://github.com/guim31/gladys-heatzy/issues).
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+## What you need
 
-## Configuration
+- Gladys Assistant 5.1.0 or later.
+- A **Heatzy account** (the e-mail address and password of the Heatzy app),
+  with your modules already set up in the app.
+- An Internet connection: the modules are only reachable through the Heatzy
+  cloud (Gizwits), there is no local API.
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+Supported modules: Pilote v1, Pilote v2 and v3 (including Elec Pro), Pilote
+v4, Pilote Pro, Glow, Onyx, Inea and Bloom. Another Heatzy module is shown
+with the common protocol of the recent modules.
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+## Set up
 
-## Actions
+1. Install the integration from the Gladys catalog.
+2. In **Configuration**, enter the **E-mail address** and the **Password** of
+   your Heatzy account, and save.
+3. Click **Test the connection**: the message under the button lists the
+   modules of the account.
+4. Open the **Discovery** tab: one device per module, named as in the Heatzy
+   app. Click **Add**, choose a room, save.
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+Options:
 
-## Scenes
+- **Refresh interval**: how often the modules are read, from 1 to 10 minutes
+  (2 minutes by default). A change made from Gladys is shown at once and
+  checked a few seconds later; a change made in the Heatzy app shows at the
+  next reading.
+- **Language of the names**: English, French, German or Spanish (French by
+  default), for the feature names (given when a device is added) and the
+  messages of the integration.
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+## The device of each module
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+| Feature          | What it is                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Pilot wire mode  | The mode of the radiator, with the Gladys pilot wire selector: Comfort, Comfort -1°C, Comfort -2°C, Eco, Frost protection, Off |
+| Child lock       | Locks the buttons of the module (not on the Pilote v1 and the Bloom)                                                           |
+| Weekly programme | On: the module follows the programme set in the Heatzy app; off: it keeps the chosen mode (not on the Pilote v1)               |
+| Room temperature | Glow, Onyx, Inea, Bloom and Pilote Pro only, read only                                                                         |
+| Humidity         | Pilote Pro only, read only                                                                                                     |
+
+Comfort -1°C and -2°C exist on the Pilote v4, Pilote Pro, Glow, Onyx, Inea and
+Bloom: the other modules refuse them with a message. The device badge shows
+**Cloud** while the module is connected to the Heatzy cloud and
+**Unreachable** when it is offline.
+
+The comfort and eco setpoints of the Glow, Onyx, Inea, Bloom and Pilote Pro
+are not shown: a setpoint would be taken for a thermostat by Gladys, HomeKit
+and the voice assistants, and a pilot wire is not one. Set them in the Heatzy
+app.
 
 ## Dashboard
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+Add the **Heatzy radiators** widget to a dashboard. By default it lists every
+radiator with its mode (and, after a dot, vacation, boost, programme and the
+room temperature); choose one radiator in its settings to show only that one.
+Its four buttons act on what the widget shows:
+
+- **Comfort**, **Eco**, **Frost protection**: immediately;
+- **Off**: after a confirmation, since it leaves the rooms unheated.
+
+The button of the current mode carries a check mark when every radiator shown
+is in it. Comfort -1°C and -2°C are on the device selector.
+
+## Scenes
+
+### Triggers
+
+- **Radiator mode changed outside Gladys**: the Heatzy app, the weekly
+  programme or a button on the module changed the mode of a radiator. Filters:
+  the radiator, the new mode. Variables: radiator name and device, new mode,
+  previous mode (`comfort`, `comfort_1`, `comfort_2`, `eco`,
+  `frost_protection`, `off`), weekly programme on. The changes Gladys makes are
+  not announced (a scene reacting to them could loop); the Gladys device
+  trigger on the _Pilot wire mode_ feature sees every change.
+- **Heatzy module offline**: a module lost its connection to the cloud (Wi-Fi,
+  power cut). Filter: the radiator.
+- **Heatzy module back online**: the module is connected again. Filter: the
+  radiator.
+
+### Actions
+
+- **Set the mode of Heatzy radiators**: one radiator, or all of them when the
+  radiator is left empty. A vacation in progress is ended. On all radiators,
+  Comfort -1°C and -2°C skip the modules that do not have them. Output: the
+  number of modules that accepted.
+- **Start the Heatzy vacation mode**: frost protection for 1 to 255 days, then
+  the module returns to its programme. Not on the Pilote v1.
+- **End the Heatzy vacation mode**: ends the vacation (or a boost started in
+  the Heatzy app).
+
+To set one radiator, the Gladys action _Control a device_ on its _Pilot wire
+mode_ feature works too.
+
+### Scene ideas
+
+- **Leaving the house** (alarm armed): _Set the mode of Heatzy radiators_,
+  every radiator, **Eco**; back home: **Comfort**.
+- **Window open** (opening sensor of the room): set that radiator to **Frost
+  protection**; closed again: **Comfort**.
+- **A module offline for the night**: _Heatzy module offline_ → send a
+  message: "The {{triggerEvent.data.radiator}} radiator is offline".
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"Heatzy refuses the e-mail address or the password"**: check them by
+  signing in to the Heatzy app. After this error, the integration stops
+  trying (so as not to lock the account) until you save the configuration or
+  click **Test the connection**.
+- **"Too many requests"**: the Heatzy cloud limits the requests; the
+  integration waits ten minutes. Choose a longer refresh interval if it comes
+  back.
+- **A radiator does not change mode**: check that the module is online in the
+  Heatzy app. With the weekly programme on, the programme takes over again at
+  its next slot: turn the _Weekly programme_ off to keep a mode.
+- **A mode is shown a few minutes late**: changes made outside Gladys are seen
+  at the next reading (the refresh interval).
+- **More details**: the logs of the integration (Settings → Integrations →
+  Heatzy). They never contain the password or the token.
+
+## Limits
+
+- Cloud only: without Internet, or when the Heatzy cloud is down, nothing can
+  be controlled from Gladys (the modules keep their mode and programme).
+- Readings every minute at most: the Heatzy cloud (Gizwits) is shared by every
+  Heatzy user and has quotas. Each reading costs one request plus one per
+  module.
+- The weekly programme itself, the setpoints, the boost and the presence
+  detection of the Pilote Pro are set in the Heatzy app.
+- The Pilote Pro shows the mode it is applying (which can differ from the one
+  requested, for example with an open window detected).
+- Developed without the hardware: feedback welcome.
+- Not affiliated with Heatzy.
