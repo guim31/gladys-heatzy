@@ -1,0 +1,4 @@
+{
+  "status": 400,
+  "body": { "error_message": "user does not exist!", "error_code": 9005, "detail_message": null }
+}

@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "protoc": 3,
+    "ws_port": 8080,
+    "port_s": 8883,
+    "gw_did": null,
+    "host": "m2m.example.invalid",
+    "sleep_duration": 0,
+    "port": 1883,
+    "mcu_soft_version": "00000001",
+    "product_key": "9420ae048da545c88fc6274d204dd25f",
+    "state_last_timestamp": 1698317159,
+    "role": "special",
+    "is_sandbox": false,
+    "type": "normal",
+    "product_name": "Heatzy",
+    "is_disabled": false,
+    "mcu_hard_version": "00000001",
+    "wifi_soft_version": "04020017",
+    "dev_alias": "Bureau",
+    "mesh_id": null,
+    "is_online": true,
+    "dev_label": [],
+    "wss_port": 8880,
+    "did": "HZ01fixturepilotev1xxx",
+    "mac": "02005e000001",
+    "passcode": "REDACTEDXX",
+    "wifi_hard_version": "00ESP826",
+    "is_low_power": false,
+    "updated_at": 1698310800
+  },
+  "latest": {
+    "did": "HZ01fixturepilotev1xxx",
+    "updated_at": 1698310800,
+    "attr": {
+      "mode": "经济"
+    }
+  }
+}

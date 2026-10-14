@@ -1,67 +1,157 @@
-# Template de démonstration
+# Heatzy
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Pilotez vos modules fil pilote [Heatzy](https://heatzy.com) depuis Gladys : le
+mode de chaque radiateur électrique (Confort, Eco, Hors gel, Off, et Confort
+-1°C / -2°C sur les modules qui les ont), le mode vacances, le verrouillage et
+la programmation, ainsi que la température ambiante sur les modèles qui la
+mesurent. Un widget de tableau de bord change tous les radiateurs d'un coup, et
+des scènes réagissent quand un radiateur change de mode ou qu'un module passe
+hors ligne.
 
-## Ce que vous obtenez
+> **Développée sans le matériel : vos retours sont les bienvenus.** Cette
+> intégration a été construite et testée sur un cloud Heatzy simulé, alimenté
+> par les vrais modules des tests de hass-heatzy (Home Assistant), pas avec un
+> vrai compte Heatzy. Si quelque chose ne marche pas comme décrit, dites-le sur
+> le [forum Gladys](https://community.gladysassistant.com) ou dans les
+> [issues](https://github.com/guim31/gladys-heatzy/issues).
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+## Ce qu'il vous faut
 
-## Configuration
+- Gladys Assistant 5.1.0 ou plus récent.
+- Un **compte Heatzy** (l'adresse e-mail et le mot de passe de l'application
+  Heatzy), avec vos modules déjà installés dans l'application.
+- Une connexion Internet : les modules ne sont joignables que par le cloud
+  Heatzy (Gizwits), il n'existe pas d'API locale.
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+Modules pris en charge : Pilote v1, Pilote v2 et v3 (Elec Pro compris), Pilote
+v4, Pilote Pro, Glow, Onyx, Inea et Bloom. Un autre module Heatzy est affiché
+avec le protocole commun des modules récents.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Mise en route
 
-## Actions
+1. Installez l'intégration depuis le catalogue de Gladys.
+2. Dans **Configuration**, saisissez l'**Adresse e-mail** et le **Mot de passe**
+   de votre compte Heatzy, puis enregistrez.
+3. Cliquez sur **Tester la connexion** : le message sous le bouton liste les
+   modules du compte.
+4. Ouvrez l'onglet **Découverte** : un appareil par module, nommé comme dans
+   l'application Heatzy. Cliquez sur **Ajouter**, choisissez une pièce,
+   enregistrez.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+Options :
 
-## Scènes
+- **Intervalle de rafraîchissement** : la fréquence de lecture des modules, de 1
+  à 10 minutes (2 minutes par défaut). Un changement fait depuis Gladys
+  s'affiche tout de suite et est vérifié quelques secondes plus tard ; un
+  changement fait dans l'application Heatzy apparaît à la lecture suivante.
+- **Langue des noms** : anglais, français, allemand ou espagnol (français par
+  défaut), pour les noms de fonctionnalités (donnés à l'ajout d'un appareil) et
+  les messages de l'intégration.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+## L'appareil de chaque module
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+| Fonctionnalité       | Ce que c'est                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Mode fil pilote      | Le mode du radiateur, avec le sélecteur fil pilote de Gladys : Confort, Confort -1°C, Confort -2°C, Eco, Hors gel, Off                |
+| Verrouillage         | Verrouille les boutons du module (pas sur le Pilote v1 ni le Bloom)                                                                   |
+| Programmation        | Allumée : le module suit la programmation réglée dans l'application Heatzy ; éteinte : il garde le mode choisi (pas sur le Pilote v1) |
+| Température ambiante | Glow, Onyx, Inea, Bloom et Pilote Pro seulement, en lecture seule                                                                     |
+| Humidité             | Pilote Pro seulement, en lecture seule                                                                                                |
+
+Confort -1°C et -2°C existent sur les Pilote v4, Pilote Pro, Glow, Onyx, Inea et
+Bloom : les autres modules les refusent avec un message. Le badge de l'appareil
+indique **Cloud** tant que le module est connecté au cloud Heatzy et
+**Injoignable** quand il est hors ligne.
+
+Les consignes confort et éco des Glow, Onyx, Inea, Bloom et Pilote Pro ne sont
+pas affichées : une consigne serait prise pour un thermostat par Gladys, HomeKit
+et les assistants vocaux, ce qu'un fil pilote n'est pas. Réglez-les dans
+l'application Heatzy.
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Ajoutez le widget **Radiateurs Heatzy** à un tableau de bord. Par défaut, il
+liste tous les radiateurs avec leur mode (et, après un point, vacances, boost,
+programme et la température ambiante) ; choisissez un radiateur dans ses
+réglages pour ne montrer que lui. Ses quatre boutons agissent sur ce que le
+widget montre :
+
+- **Confort**, **Eco**, **Hors gel** : immédiatement ;
+- **Off** : après une confirmation, puisqu'il laisse les pièces sans chauffage.
+
+Le bouton du mode en cours porte une coche quand tous les radiateurs montrés y
+sont. Confort -1°C et -2°C sont sur le sélecteur de l'appareil.
+
+## Scènes
+
+### Déclencheurs
+
+- **Mode d'un radiateur changé hors de Gladys** : l'application Heatzy, la
+  programmation ou un bouton du module a changé le mode d'un radiateur. Filtres
+  : le radiateur, le nouveau mode. Variables : nom et appareil du radiateur,
+  nouveau mode, mode précédent (`comfort`, `comfort_1`, `comfort_2`, `eco`,
+  `frost_protection`, `off`), programmation active. Les changements faits par
+  Gladys ne sont pas annoncés (une scène qui y réagirait pourrait boucler) ; le
+  déclencheur d'appareil de Gladys sur la fonctionnalité _Mode fil pilote_ voit
+  tous les changements.
+- **Module Heatzy hors ligne** : un module a perdu sa connexion au cloud (Wi-Fi,
+  coupure de courant). Filtre : le radiateur.
+- **Module Heatzy de retour en ligne** : le module est de nouveau connecté.
+  Filtre : le radiateur.
+
+### Actions
+
+- **Mettre des radiateurs Heatzy dans un mode** : un radiateur, ou tous si le
+  radiateur est laissé vide. Des vacances en cours sont arrêtées, et la
+  programmation éteinte pour que le mode tienne. Sur tous les radiateurs,
+  Confort -1°C et -2°C sautent les modules qui ne les ont pas. Sortie : le
+  nombre de modules ayant accepté.
+- **Démarrer le mode vacances Heatzy** : hors gel pendant 1 à 255 jours, puis le
+  module reprend sa programmation. Pas sur le Pilote v1.
+- **Arrêter le mode vacances Heatzy** : arrête les vacances (ou un boost lancé
+  dans l'application Heatzy).
+
+Pour un seul radiateur, l'action Gladys _Contrôler un appareil_ sur sa
+fonctionnalité _Mode fil pilote_ fonctionne aussi.
+
+### Idées de scènes
+
+- **Départ de la maison** (alarme activée) : _Mettre des radiateurs Heatzy dans
+  un mode_, tous les radiateurs, **Eco** ; au retour : **Confort**.
+- **Fenêtre ouverte** (détecteur d'ouverture de la pièce) : passer ce radiateur
+  en **Hors gel** ; refermée : **Confort**.
+- **Un module hors ligne pour la nuit** : _Module Heatzy hors ligne_ → envoyer
+  un message : « Le radiateur {{triggerEvent.data.radiator}} est hors ligne ».
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Heatzy refuse l'adresse e-mail ou le mot de passe »** : vérifiez-les en
+  vous connectant à l'application Heatzy. Après cette erreur, l'intégration
+  arrête d'essayer (pour ne pas bloquer le compte) jusqu'à ce que vous
+  enregistriez la configuration ou cliquiez sur **Tester la connexion**.
+- **« Trop de requêtes »** : le cloud Heatzy limite les requêtes ; l'intégration
+  patiente dix minutes. Choisissez un intervalle plus long si cela revient.
+- **Un radiateur ne change pas de mode** : vérifiez que le module est en ligne
+  dans l'application Heatzy. Un mode choisi dans Gladys éteint la
+  _Programmation_, pour qu'il tienne : rallumez-la pour revenir à la
+  programmation.
+- **Un mode s'affiche avec quelques minutes de retard** : les changements faits
+  hors de Gladys sont vus à la lecture suivante (l'intervalle de
+  rafraîchissement).
+- **Plus de détails** : les journaux de l'intégration (Paramètres → Intégrations
+  → Heatzy). Ils ne contiennent jamais le mot de passe ni le jeton.
+
+## Limites
+
+- Cloud uniquement : sans Internet, ou quand le cloud Heatzy est en panne, rien
+  ne se pilote depuis Gladys (les modules gardent leur mode et leur
+  programmation).
+- Lecture toutes les minutes au plus : le cloud Heatzy (Gizwits) est partagé par
+  tous les utilisateurs Heatzy et a des quotas. Chaque lecture coûte une
+  requête, plus une par module.
+- La programmation elle-même, les consignes, le boost et la détection de
+  présence du Pilote Pro se règlent dans l'application Heatzy.
+- Le Pilote Pro affiche le mode qu'il applique (qui peut différer du mode
+  demandé, par exemple quand il détecte une fenêtre ouverte).
+- Développée sans le matériel : vos retours sont les bienvenus.
+- Sans lien avec Heatzy.

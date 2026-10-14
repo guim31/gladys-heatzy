@@ -30,6 +30,12 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+The integration keeps the e-mail address and the password of the Heatzy
+account in the Gladys configuration (the password as a secret field), and sends
+them only to the Heatzy cloud (`https://euapi.gizwits.com`, over HTTPS). The
+session token lives in memory only; nothing is written to `/data`. The logs
+never contain the e-mail address, the password or the token.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and the Heatzy cloud, app and modules.
