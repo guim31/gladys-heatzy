@@ -5,6 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { ERROR_KINDS, HeatzyClient } from '../src/heatzy/client.js';
 import { EMAIL, FakeGizwits, PASSWORD } from './helpers/fakeGizwits.js';
 import { createClock } from './helpers/world.js';
@@ -105,4 +106,21 @@ test('no login without credentials', async () => {
   const err = await client.getBindings().catch((error) => error);
   assert.equal(err.kind, ERROR_KINDS.AUTH);
   assert.equal(cloud.requests.length, 0);
+});
+
+// Answers of the real Gizwits cloud (14/10/2026), captured with an invented
+// account from the locked container: test/fixtures/heatzy/real/.
+const real = (name) =>
+  JSON.parse(readFileSync(new URL(`./fixtures/heatzy/real/${name}.json`, import.meta.url), 'utf8'));
+
+test('real cloud answers: unknown account, refused token', async () => {
+  const { cloud, client } = setup();
+  cloud.failures.push(real('login-user-not-found'));
+  const err = await client.getBindings().catch((error) => error);
+  assert.equal(err.kind, ERROR_KINDS.AUTH);
+
+  await client.getBindings();
+  cloud.failures.push(real('token-invalid'));
+  assert.equal((await client.getBindings()).length, 8);
+  assert.equal(cloud.logins, 2); // the forced answer replaced the first login
 });

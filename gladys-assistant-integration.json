@@ -459,10 +459,10 @@
         "es": "Poner radiadores Heatzy en un modo"
       },
       "description": {
-        "en": "One radiator or all of them. A vacation in progress is ended. Comfort -1 and -2 are skipped on the modules without them.",
-        "fr": "Un radiateur ou tous. Des vacances en cours sont arrêtées. Confort -1 et -2 sont ignorés par les modules qui ne les ont pas.",
-        "de": "Ein Heizkörper oder alle. Ein laufender Urlaub wird beendet. Komfort -1 und -2 werden bei Modulen ohne diese Modi übersprungen.",
-        "es": "Un radiador o todos. Unas vacaciones en curso se terminan. Confort -1 y -2 se omiten en los módulos que no los tienen."
+        "en": "One radiator or all of them. A vacation in progress is ended and the weekly programme turned off, so that the mode sticks. Comfort -1 and -2 are skipped on the modules without them.",
+        "fr": "Un radiateur ou tous. Des vacances en cours sont arrêtées et la programmation éteinte, pour que le mode tienne. Confort -1 et -2 sont ignorés par les modules qui ne les ont pas.",
+        "de": "Ein Heizkörper oder alle. Ein laufender Urlaub wird beendet und das Wochenprogramm ausgeschaltet, damit der Modus bleibt. Komfort -1 und -2 werden bei Modulen ohne diese Modi übersprungen.",
+        "es": "Un radiador o todos. Unas vacaciones en curso se terminan y la programación semanal se desactiva, para que el modo se mantenga. Confort -1 y -2 se omiten en los módulos que no los tienen."
       },
       "timeout_seconds": 60,
       "fields": [

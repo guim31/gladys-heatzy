@@ -33,6 +33,7 @@ const OFFLINE_ERRORS = new Set([9017, 9042]); // device offline, device not onli
 const RATE_ERRORS = new Set([9999]);
 
 const BINDINGS_PAGE = 100;
+const MAX_PAGES = 20;
 // Renew the token this long before it expires.
 const TOKEN_MARGIN_MS = 5 * 60_000;
 
@@ -163,7 +164,8 @@ export class HeatzyClient {
       if (err.kind !== ERROR_KINDS.REFUSED || !(err.status === 401 || TOKEN_ERRORS.has(err.code))) {
         throw err;
       }
-      const renewed = await this.getToken({ force: true });
+      // Another request may have renewed it meanwhile: log in only once.
+      const renewed = this.token === token ? await this.getToken({ force: true }) : this.token;
       return this.send(method, path, { body, token: renewed, what });
     }
   }
@@ -171,18 +173,22 @@ export class HeatzyClient {
   /** Every module of the account. */
   async getBindings() {
     const devices = [];
-    for (let skip = 0; ; skip += BINDINGS_PAGE) {
-      const page = await this.call(
+    for (let skip = 0, page = 0; page < MAX_PAGES; page += 1) {
+      const answer = await this.call(
         'GET',
         `bindings?limit=${BINDINGS_PAGE}&skip=${skip}`,
         'Module list',
       );
-      const list = Array.isArray(page.devices) ? page.devices : [];
+      const list = Array.isArray(answer.devices) ? answer.devices : [];
       devices.push(...list.filter((device) => device && typeof device.did === 'string'));
-      if (list.length < BINDINGS_PAGE) {
-        return devices;
+      skip += list.length;
+      // A short page ends the list, unless Gizwits capped the page size (its
+      // default is 20): a page of a multiple of 20 asks for the next one.
+      if (list.length === 0 || (list.length < BINDINGS_PAGE && list.length % 20 !== 0)) {
+        break;
       }
     }
+    return devices;
   }
 
   /** Latest attributes of a module. */

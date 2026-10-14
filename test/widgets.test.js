@@ -78,7 +78,7 @@ test('a button sets the mode of what the widget shows', async (t) => {
   );
   assert.equal(all.success, true, all.error);
   assert.match(JSON.stringify(all.data), /8 radiateur/);
-  assert.equal(world.cloud.attr('glow').on_off, 0);
+  assert.equal(world.cloud.attr('glow').on_off, false);
   // The mode comes from the action key, not from the params.
   await world.fake.widgetAction(WIDGET_KEY, ACTIONS.ECO, { mode: 'off' }, { settings: {} });
   assert.equal(world.cloud.attr('pilote-v2').mode, 'eco');

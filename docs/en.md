@@ -1,15 +1,15 @@
 # Heatzy
 
 Control your [Heatzy](https://heatzy.com) pilot wire modules from Gladys: the
-mode of each electric radiator (Comfort, Eco, Frost protection, Off, and
-Comfort -1°C / -2°C on the modules that have them), the vacation mode, the
-child lock and the weekly programme, plus the room temperature on the models
-that measure it. A dashboard widget switches every radiator at once, and
-scenes react when a radiator changes mode or a module goes offline.
+mode of each electric radiator (Comfort, Eco, Frost protection, Off, and Comfort
+-1°C / -2°C on the modules that have them), the vacation mode, the child lock
+and the weekly programme, plus the room temperature on the models that measure
+it. A dashboard widget switches every radiator at once, and scenes react when a
+radiator changes mode or a module goes offline.
 
 > **Developed without the hardware: feedback welcome.** This integration was
-> built and tested against a simulated Heatzy cloud fed with the real modules
-> of the hass-heatzy tests (Home Assistant), not with a real Heatzy account. If
+> built and tested against a simulated Heatzy cloud fed with the real modules of
+> the hass-heatzy tests (Home Assistant), not with a real Heatzy account. If
 > something does not work as described, say so on the
 > [Gladys forum](https://community.gladysassistant.com) or in the
 > [issues](https://github.com/guim31/gladys-heatzy/issues).
@@ -17,31 +17,30 @@ scenes react when a radiator changes mode or a module goes offline.
 ## What you need
 
 - Gladys Assistant 5.1.0 or later.
-- A **Heatzy account** (the e-mail address and password of the Heatzy app),
-  with your modules already set up in the app.
+- A **Heatzy account** (the e-mail address and password of the Heatzy app), with
+  your modules already set up in the app.
 - An Internet connection: the modules are only reachable through the Heatzy
   cloud (Gizwits), there is no local API.
 
-Supported modules: Pilote v1, Pilote v2 and v3 (including Elec Pro), Pilote
-v4, Pilote Pro, Glow, Onyx, Inea and Bloom. Another Heatzy module is shown
-with the common protocol of the recent modules.
+Supported modules: Pilote v1, Pilote v2 and v3 (including Elec Pro), Pilote v4,
+Pilote Pro, Glow, Onyx, Inea and Bloom. Another Heatzy module is shown with the
+common protocol of the recent modules.
 
 ## Set up
 
 1. Install the integration from the Gladys catalog.
 2. In **Configuration**, enter the **E-mail address** and the **Password** of
    your Heatzy account, and save.
-3. Click **Test the connection**: the message under the button lists the
-   modules of the account.
+3. Click **Test the connection**: the message under the button lists the modules
+   of the account.
 4. Open the **Discovery** tab: one device per module, named as in the Heatzy
    app. Click **Add**, choose a room, save.
 
 Options:
 
-- **Refresh interval**: how often the modules are read, from 1 to 10 minutes
-  (2 minutes by default). A change made from Gladys is shown at once and
-  checked a few seconds later; a change made in the Heatzy app shows at the
-  next reading.
+- **Refresh interval**: how often the modules are read, from 1 to 10 minutes (2
+  minutes by default). A change made from Gladys is shown at once and checked a
+  few seconds later; a change made in the Heatzy app shows at the next reading.
 - **Language of the names**: English, French, German or Spanish (French by
   default), for the feature names (given when a device is added) and the
   messages of the integration.
@@ -58,13 +57,12 @@ Options:
 
 Comfort -1°C and -2°C exist on the Pilote v4, Pilote Pro, Glow, Onyx, Inea and
 Bloom: the other modules refuse them with a message. The device badge shows
-**Cloud** while the module is connected to the Heatzy cloud and
-**Unreachable** when it is offline.
+**Cloud** while the module is connected to the Heatzy cloud and **Unreachable**
+when it is offline.
 
-The comfort and eco setpoints of the Glow, Onyx, Inea, Bloom and Pilote Pro
-are not shown: a setpoint would be taken for a thermostat by Gladys, HomeKit
-and the voice assistants, and a pilot wire is not one. Set them in the Heatzy
-app.
+The comfort and eco setpoints of the Glow, Onyx, Inea, Bloom and Pilote Pro are
+not shown: a setpoint would be taken for a thermostat by Gladys, HomeKit and the
+voice assistants, and a pilot wire is not one. Set them in the Heatzy app.
 
 ## Dashboard
 
@@ -76,20 +74,20 @@ Its four buttons act on what the widget shows:
 - **Comfort**, **Eco**, **Frost protection**: immediately;
 - **Off**: after a confirmation, since it leaves the rooms unheated.
 
-The button of the current mode carries a check mark when every radiator shown
-is in it. Comfort -1°C and -2°C are on the device selector.
+The button of the current mode carries a check mark when every radiator shown is
+in it. Comfort -1°C and -2°C are on the device selector.
 
 ## Scenes
 
 ### Triggers
 
-- **Radiator mode changed outside Gladys**: the Heatzy app, the weekly
-  programme or a button on the module changed the mode of a radiator. Filters:
-  the radiator, the new mode. Variables: radiator name and device, new mode,
-  previous mode (`comfort`, `comfort_1`, `comfort_2`, `eco`,
-  `frost_protection`, `off`), weekly programme on. The changes Gladys makes are
-  not announced (a scene reacting to them could loop); the Gladys device
-  trigger on the _Pilot wire mode_ feature sees every change.
+- **Radiator mode changed outside Gladys**: the Heatzy app, the weekly programme
+  or a button on the module changed the mode of a radiator. Filters: the
+  radiator, the new mode. Variables: radiator name and device, new mode,
+  previous mode (`comfort`, `comfort_1`, `comfort_2`, `eco`, `frost_protection`,
+  `off`), weekly programme on. The changes Gladys makes are not announced (a
+  scene reacting to them could loop); the Gladys device trigger on the _Pilot
+  wire mode_ feature sees every change.
 - **Heatzy module offline**: a module lost its connection to the cloud (Wi-Fi,
   power cut). Filter: the radiator.
 - **Heatzy module back online**: the module is connected again. Filter: the
@@ -98,38 +96,38 @@ is in it. Comfort -1°C and -2°C are on the device selector.
 ### Actions
 
 - **Set the mode of Heatzy radiators**: one radiator, or all of them when the
-  radiator is left empty. A vacation in progress is ended. On all radiators,
-  Comfort -1°C and -2°C skip the modules that do not have them. Output: the
-  number of modules that accepted.
+  radiator is left empty. A vacation in progress is ended, and the weekly
+  programme turned off so that the mode sticks. On all radiators, Comfort -1°C
+  and -2°C skip the modules that do not have them. Output: the number of modules
+  that accepted.
 - **Start the Heatzy vacation mode**: frost protection for 1 to 255 days, then
   the module returns to its programme. Not on the Pilote v1.
-- **End the Heatzy vacation mode**: ends the vacation (or a boost started in
-  the Heatzy app).
+- **End the Heatzy vacation mode**: ends the vacation (or a boost started in the
+  Heatzy app).
 
 To set one radiator, the Gladys action _Control a device_ on its _Pilot wire
 mode_ feature works too.
 
 ### Scene ideas
 
-- **Leaving the house** (alarm armed): _Set the mode of Heatzy radiators_,
-  every radiator, **Eco**; back home: **Comfort**.
+- **Leaving the house** (alarm armed): _Set the mode of Heatzy radiators_, every
+  radiator, **Eco**; back home: **Comfort**.
 - **Window open** (opening sensor of the room): set that radiator to **Frost
   protection**; closed again: **Comfort**.
-- **A module offline for the night**: _Heatzy module offline_ → send a
-  message: "The {{triggerEvent.data.radiator}} radiator is offline".
+- **A module offline for the night**: _Heatzy module offline_ → send a message:
+  "The {{triggerEvent.data.radiator}} radiator is offline".
 
 ## Troubleshooting
 
-- **"Heatzy refuses the e-mail address or the password"**: check them by
-  signing in to the Heatzy app. After this error, the integration stops
-  trying (so as not to lock the account) until you save the configuration or
-  click **Test the connection**.
-- **"Too many requests"**: the Heatzy cloud limits the requests; the
-  integration waits ten minutes. Choose a longer refresh interval if it comes
-  back.
+- **"Heatzy refuses the e-mail address or the password"**: check them by signing
+  in to the Heatzy app. After this error, the integration stops trying (so as
+  not to lock the account) until you save the configuration or click **Test the
+  connection**.
+- **"Too many requests"**: the Heatzy cloud limits the requests; the integration
+  waits ten minutes. Choose a longer refresh interval if it comes back.
 - **A radiator does not change mode**: check that the module is online in the
-  Heatzy app. With the weekly programme on, the programme takes over again at
-  its next slot: turn the _Weekly programme_ off to keep a mode.
+  Heatzy app. A mode chosen in Gladys turns the _Weekly programme_ off, so that
+  it sticks: turn it back on to return to the programme.
 - **A mode is shown a few minutes late**: changes made outside Gladys are seen
   at the next reading (the refresh interval).
 - **More details**: the logs of the integration (Settings → Integrations →
@@ -137,8 +135,8 @@ mode_ feature works too.
 
 ## Limits
 
-- Cloud only: without Internet, or when the Heatzy cloud is down, nothing can
-  be controlled from Gladys (the modules keep their mode and programme).
+- Cloud only: without Internet, or when the Heatzy cloud is down, nothing can be
+  controlled from Gladys (the modules keep their mode and programme).
 - Readings every minute at most: the Heatzy cloud (Gizwits) is shared by every
   Heatzy user and has quotas. Each reading costs one request plus one per
   module.

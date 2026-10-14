@@ -13,15 +13,16 @@
 // dark mode. Comfort -1 / -2 stay on the device (pilot-wire selector).
 //
 // Budget (8 components, 1 status, 4 buttons): one status list (up to ten
-// radiators), four buttons; the values are sent as text, not bound to device
-// features, so the widget works before the devices are added to Gladys.
+// radiators), four buttons, and a caption when the cloud cannot be read; the
+// values are sent as text, not bound to device features, so the widget works
+// before the devices are added to Gladys.
 // -----------------------------------------------------------------------------
 
 import { WIDGET_COLORS } from '@gladysassistant/integration-sdk';
 import { moduleName } from './devices.js';
 import { WIDGET_KEY } from './hub.js';
 import { DEROGATION, MODE_BY_KEY, MODE_KEYS, PILOT_WIRE } from './heatzy/model.js';
-import { MODE_TEXT, pick } from './texts.js';
+import { ERROR_TEXT, MODE_TEXT, pick } from './texts.js';
 
 // Action keys of the buttons: permanent once published (unique, the core
 // drops a button whose key is taken).
@@ -175,6 +176,14 @@ async function get(hub, { settings, language = 'fr' }) {
   }
   const online = modules.filter((module) => module.online);
   const components = [{ type: 'status', items }];
+  if (hub.cloud.error) {
+    // The rows are the last known modes: say they may be out of date.
+    components.unshift({
+      type: 'text',
+      variant: 'caption',
+      text: fit(t(ERROR_TEXT[hub.cloud.error.kind], language), 80),
+    });
+  }
   for (const button of BUTTONS) {
     const mode = MODE_BY_KEY[button.mode];
     const active = online.length > 0 && online.every((module) => module.mode === mode);

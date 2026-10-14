@@ -69,8 +69,10 @@ Spanish), also shown by Gladys.
   every 1 to 10 minutes (2 by default). The devices are published with
   `should_poll: false`.
 - Commands: `POST /app/control/<did>` with `{ attrs: { mode } }`, or the raw
-  frame `[1, 1, n]` of the Pilote v1. The new state is published at once, then
-  confirmed by a reading five seconds later.
+  frame `[1, 1, n]` of the Pilote v1. A mode also ends a vacation in progress
+  and turns the weekly programme off, so that it sticks. The new state is
+  published at once (except on the Pilote Pro, which reports the mode it
+  applies), then confirmed by a reading five seconds later.
 - The token is kept in memory only and renewed when refused. Nothing is
   written to `/data`.
 - A refused password stops the readings (so as not to lock the account) until

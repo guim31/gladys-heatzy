@@ -56,6 +56,9 @@ export const HUB_TIMINGS = {
   heartbeatMs: 12 * 60 * 60_000,
 };
 
+// Errors of a module reading that concern the whole cloud.
+const CLOUD_ERRORS = new Set([ERROR_KINDS.AUTH, ERROR_KINDS.RATE_LIMITED, ERROR_KINDS.UNREACHABLE]);
+
 const signature = (config) => JSON.stringify([config.email, config.password]);
 
 export class HeatzyHub {
@@ -144,6 +147,8 @@ export class HeatzyHub {
       this.cloud = { read: false, error: null };
       this.devicesKey = null;
       this.warned.clear();
+      // The previous account's modules leave the Discovery tab at once.
+      await this.publishDevices();
     }
     if (!this.client) {
       clearTimeout(this.pollTimer);
@@ -165,8 +170,12 @@ export class HeatzyHub {
 
   /** Read now, then schedule the next reading. */
   async pollNow() {
-    await this.poll();
-    this.schedulePoll();
+    try {
+      await this.poll();
+    } finally {
+      // Even after an unexpected error: one bad reading never stops the timer.
+      this.schedulePoll();
+    }
   }
 
   schedulePoll() {
@@ -195,9 +204,16 @@ export class HeatzyHub {
 
   /** Read the module list and every module. Concurrent calls share the reading. */
   poll() {
-    this.polling ??= this.read().finally(() => {
-      this.polling = null;
-    });
+    // A reading started for a previous account is not shared: start a new one.
+    if (!this.polling || this.polling.client !== this.client) {
+      const polling = this.read().finally(() => {
+        if (this.polling === polling) {
+          this.polling = null;
+        }
+      });
+      polling.client = this.client;
+      this.polling = polling;
+    }
     return this.polling;
   }
 
@@ -231,6 +247,14 @@ export class HeatzyHub {
         if (!err.kind) {
           throw err;
         }
+        if (CLOUD_ERRORS.has(err.kind)) {
+          // A cloud problem, not a module one: stop here (quota, outage) and
+          // let the status and the backoff handle it.
+          if (client === this.client) {
+            await this.applyCloudFailure(err);
+          }
+          return;
+        }
         this.problem(`read:${binding.did}`, `Module ${binding.did}: ${err.message}`);
         readings.push({ binding, attrs: null, error: err });
       }
@@ -259,6 +283,10 @@ export class HeatzyHub {
     const wasError = this.cloud.error;
     const firstReading = !this.cloud.read;
     this.cloud = { read: true, error: null };
+    if (wasError?.kind === ERROR_KINDS.AUTH) {
+      // The readings had stopped on the refused password: start them again.
+      this.schedulePoll();
+    }
     if (wasError) {
       logger.info('Heatzy cloud: connection restored');
     } else if (firstReading) {
@@ -292,7 +320,11 @@ export class HeatzyHub {
     }
     await this.publishDevices();
     for (const module of this.modules.values()) {
-      await this.publishStates(module);
+      // An offline module's last values are not re-sent: the heartbeat would
+      // keep them looking fresh. Its badge says Unreachable.
+      if (module.online) {
+        await this.publishStates(module);
+      }
     }
     await this.publishTransports();
     await this.publishConnectionStatus();
@@ -316,7 +348,15 @@ export class HeatzyHub {
       await this.fire(TRIGGERS.ONLINE, next, {});
       changed = true;
     }
-    if (next.read && previous.mode !== null && next.mode !== null && previous.mode !== next.mode) {
+    const derogationChanged = previous.derogation !== next.derogation;
+    if (
+      next.read &&
+      previous.mode !== null &&
+      next.mode !== null &&
+      previous.mode !== next.mode &&
+      // A vacation starting or ending changes the mode by itself.
+      !derogationChanged
+    ) {
       changed = true;
       // A change Gladys asked for is not announced: a scene reacting to it
       // could loop through the integration. The core's own device trigger
@@ -330,7 +370,7 @@ export class HeatzyHub {
       }
     }
     changed ||=
-      previous.derogation !== next.derogation ||
+      derogationChanged ||
       previous.derogationTime !== next.derogationTime ||
       previous.temperature !== next.temperature ||
       previous.programming !== next.programming;

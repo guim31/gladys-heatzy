@@ -40,8 +40,8 @@ avec le protocole commun des modules récents.
 
 Options :
 
-- **Intervalle de rafraîchissement** : la fréquence de lecture des modules, de
-  1 à 10 minutes (2 minutes par défaut). Un changement fait depuis Gladys
+- **Intervalle de rafraîchissement** : la fréquence de lecture des modules, de 1
+  à 10 minutes (2 minutes par défaut). Un changement fait depuis Gladys
   s'affiche tout de suite et est vérifié quelques secondes plus tard ; un
   changement fait dans l'application Heatzy apparaît à la lecture suivante.
 - **Langue des noms** : anglais, français, allemand ou espagnol (français par
@@ -64,8 +64,8 @@ indique **Cloud** tant que le module est connecté au cloud Heatzy et
 **Injoignable** quand il est hors ligne.
 
 Les consignes confort et éco des Glow, Onyx, Inea, Bloom et Pilote Pro ne sont
-pas affichées : une consigne serait prise pour un thermostat par Gladys,
-HomeKit et les assistants vocaux, ce qu'un fil pilote n'est pas. Réglez-les dans
+pas affichées : une consigne serait prise pour un thermostat par Gladys, HomeKit
+et les assistants vocaux, ce qu'un fil pilote n'est pas. Réglez-les dans
 l'application Heatzy.
 
 ## Tableau de bord
@@ -87,8 +87,8 @@ sont. Confort -1°C et -2°C sont sur le sélecteur de l'appareil.
 ### Déclencheurs
 
 - **Mode d'un radiateur changé hors de Gladys** : l'application Heatzy, la
-  programmation ou un bouton du module a changé le mode d'un radiateur. Filtres :
-  le radiateur, le nouveau mode. Variables : nom et appareil du radiateur,
+  programmation ou un bouton du module a changé le mode d'un radiateur. Filtres
+  : le radiateur, le nouveau mode. Variables : nom et appareil du radiateur,
   nouveau mode, mode précédent (`comfort`, `comfort_1`, `comfort_2`, `eco`,
   `frost_protection`, `off`), programmation active. Les changements faits par
   Gladys ne sont pas annoncés (une scène qui y réagirait pourrait boucler) ; le
@@ -102,9 +102,10 @@ sont. Confort -1°C et -2°C sont sur le sélecteur de l'appareil.
 ### Actions
 
 - **Mettre des radiateurs Heatzy dans un mode** : un radiateur, ou tous si le
-  radiateur est laissé vide. Des vacances en cours sont arrêtées. Sur tous les
-  radiateurs, Confort -1°C et -2°C sautent les modules qui ne les ont pas.
-  Sortie : le nombre de modules ayant accepté.
+  radiateur est laissé vide. Des vacances en cours sont arrêtées, et la
+  programmation éteinte pour que le mode tienne. Sur tous les radiateurs,
+  Confort -1°C et -2°C sautent les modules qui ne les ont pas. Sortie : le
+  nombre de modules ayant accepté.
 - **Démarrer le mode vacances Heatzy** : hors gel pendant 1 à 255 jours, puis le
   module reprend sa programmation. Pas sur le Pilote v1.
 - **Arrêter le mode vacances Heatzy** : arrête les vacances (ou un boost lancé
@@ -119,8 +120,8 @@ fonctionnalité _Mode fil pilote_ fonctionne aussi.
   un mode_, tous les radiateurs, **Eco** ; au retour : **Confort**.
 - **Fenêtre ouverte** (détecteur d'ouverture de la pièce) : passer ce radiateur
   en **Hors gel** ; refermée : **Confort**.
-- **Un module hors ligne pour la nuit** : _Module Heatzy hors ligne_ → envoyer un
-  message : « Le radiateur {{triggerEvent.data.radiator}} est hors ligne ».
+- **Un module hors ligne pour la nuit** : _Module Heatzy hors ligne_ → envoyer
+  un message : « Le radiateur {{triggerEvent.data.radiator}} est hors ligne ».
 
 ## Dépannage
 
@@ -131,13 +132,14 @@ fonctionnalité _Mode fil pilote_ fonctionne aussi.
 - **« Trop de requêtes »** : le cloud Heatzy limite les requêtes ; l'intégration
   patiente dix minutes. Choisissez un intervalle plus long si cela revient.
 - **Un radiateur ne change pas de mode** : vérifiez que le module est en ligne
-  dans l'application Heatzy. Programmation allumée, la programmation reprend la
-  main à son créneau suivant : éteignez la _Programmation_ pour garder un mode.
+  dans l'application Heatzy. Un mode choisi dans Gladys éteint la
+  _Programmation_, pour qu'il tienne : rallumez-la pour revenir à la
+  programmation.
 - **Un mode s'affiche avec quelques minutes de retard** : les changements faits
   hors de Gladys sont vus à la lecture suivante (l'intervalle de
   rafraîchissement).
-- **Plus de détails** : les journaux de l'intégration (Paramètres →
-  Intégrations → Heatzy). Ils ne contiennent jamais le mot de passe ni le jeton.
+- **Plus de détails** : les journaux de l'intégration (Paramètres → Intégrations
+  → Heatzy). Ils ne contiennent jamais le mot de passe ni le jeton.
 
 ## Limites
 
@@ -145,8 +147,8 @@ fonctionnalité _Mode fil pilote_ fonctionne aussi.
   ne se pilote depuis Gladys (les modules gardent leur mode et leur
   programmation).
 - Lecture toutes les minutes au plus : le cloud Heatzy (Gizwits) est partagé par
-  tous les utilisateurs Heatzy et a des quotas. Chaque lecture coûte une requête,
-  plus une par module.
+  tous les utilisateurs Heatzy et a des quotas. Chaque lecture coûte une
+  requête, plus une par module.
 - La programmation elle-même, les consignes, le boost et la détection de
   présence du Pilote Pro se règlent dans l'application Heatzy.
 - Le Pilote Pro affiche le mode qu'il applique (qui peut différer du mode

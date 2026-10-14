@@ -78,9 +78,9 @@ Widget zeigt:
 - **Komfort**, **Öko**, **Frostschutz**: sofort;
 - **Aus**: nach einer Bestätigung, da die Räume dann unbeheizt bleiben.
 
-Die Taste des aktuellen Modus trägt ein Häkchen, wenn alle gezeigten
-Heizkörper in diesem Modus sind. Komfort -1°C und -2°C findest du in der Auswahl
-des Geräts.
+Die Taste des aktuellen Modus trägt ein Häkchen, wenn alle gezeigten Heizkörper
+in diesem Modus sind. Komfort -1°C und -2°C findest du in der Auswahl des
+Geräts.
 
 ## Szenen
 
@@ -92,8 +92,8 @@ des Geräts.
   des Heizkörpers, neuer Modus, vorheriger Modus (`comfort`, `comfort_1`,
   `comfort_2`, `eco`, `frost_protection`, `off`), Wochenprogramm aktiv.
   Änderungen durch Gladys werden nicht gemeldet (eine Szene, die darauf
-  reagiert, könnte sich im Kreis drehen); der Geräte-Auslöser von Gladys auf
-  der Funktion _Steuerdraht-Modus_ sieht jede Änderung.
+  reagiert, könnte sich im Kreis drehen); der Geräte-Auslöser von Gladys auf der
+  Funktion _Steuerdraht-Modus_ sieht jede Änderung.
 - **Heatzy-Modul offline**: Ein Modul hat die Verbindung zur Cloud verloren
   (WLAN, Stromausfall). Filter: der Heizkörper.
 - **Heatzy-Modul wieder online**: Das Modul ist wieder verbunden. Filter: der
@@ -102,9 +102,10 @@ des Geräts.
 ### Aktionen
 
 - **Modus von Heatzy-Heizkörpern setzen**: ein Heizkörper oder alle, wenn der
-  Heizkörper leer bleibt. Ein laufender Urlaub wird beendet. Bei allen
-  Heizkörpern überspringen Komfort -1°C und -2°C die Module ohne diese Modi.
-  Ausgabe: die Anzahl der Module, die angenommen haben.
+  Heizkörper leer bleibt. Ein laufender Urlaub wird beendet und das
+  Wochenprogramm ausgeschaltet, damit der Modus bleibt. Bei allen Heizkörpern
+  überspringen Komfort -1°C und -2°C die Module ohne diese Modi. Ausgabe: die
+  Anzahl der Module, die angenommen haben.
 - **Heatzy-Urlaubsmodus starten**: Frostschutz für 1 bis 255 Tage, danach kehrt
   das Modul zu seinem Programm zurück. Nicht beim Pilote v1.
 - **Heatzy-Urlaubsmodus beenden**: beendet den Urlaub (oder einen in der
@@ -126,15 +127,14 @@ steuern_ auf seiner Funktion _Steuerdraht-Modus_.
 
 - **„Heatzy lehnt die E-Mail-Adresse oder das Passwort ab"**: Prüfe sie, indem
   du dich in der Heatzy-App anmeldest. Nach diesem Fehler hört die Integration
-  auf, es zu versuchen (um das Konto nicht zu sperren), bis du die
-  Konfiguration speicherst oder auf **Verbindung testen** klickst.
+  auf, es zu versuchen (um das Konto nicht zu sperren), bis du die Konfiguration
+  speicherst oder auf **Verbindung testen** klickst.
 - **„Zu viele Anfragen"**: Die Heatzy-Cloud begrenzt die Anfragen; die
   Integration wartet zehn Minuten. Wähle ein längeres Intervall, wenn es wieder
   vorkommt.
 - **Ein Heizkörper wechselt den Modus nicht**: Prüfe in der Heatzy-App, ob das
-  Modul online ist. Mit eingeschaltetem Wochenprogramm übernimmt das Programm
-  beim nächsten Zeitfenster wieder: Schalte das _Wochenprogramm_ aus, um einen
-  Modus zu behalten.
+  Modul online ist. Ein in Gladys gewählter Modus schaltet das _Wochenprogramm_
+  aus, damit er bleibt: Schalte es wieder ein, um zum Programm zurückzukehren.
 - **Ein Modus erscheint ein paar Minuten zu spät**: Änderungen außerhalb von
   Gladys werden beim nächsten Lesen gesehen (das Aktualisierungsintervall).
 - **Mehr Details**: die Protokolle der Integration (Einstellungen →

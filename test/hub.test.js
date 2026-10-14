@@ -218,3 +218,63 @@ test('a module removed from the account leaves the discovery list', async (t) =>
   await world.hub.poll();
   assert.equal(world.fake.discoveredDevices.length, 7);
 });
+
+test('a rate limit while reading the modules stops the reading and backs off', async (t) => {
+  const world = await createWorld();
+  t.after(() => world.app.stop());
+  const before = world.cloud.requests.length;
+  world.cloud.failures.push(undefined, undefined, { status: 429, body: null });
+  await world.hub.poll();
+  // The list, module 1, module 2 refused: nothing more.
+  assert.equal(world.cloud.requests.length - before, 3);
+  assert.equal(world.fake.connectionStatus.connected, false);
+  assert.equal(world.hub.cloud.error.kind, 'rate_limited');
+  const widget = await world.fake.widgetGet('radiators', { settings: {}, language: 'en' });
+  assert.equal(widget.data.content.components[0].type, 'text');
+});
+
+test('a new account during a reading is read at once, not at the next interval', async (t) => {
+  const world = await createWorld();
+  t.after(() => world.app.stop());
+  const reading = world.hub.poll();
+  await world.fake.configUpdated({ ...ACCOUNT, language: 'fr', email: 'other@example.com' });
+  await reading;
+  // The new (refused) account was read, not the old reading reused.
+  assert.equal(world.hub.cloud.error.kind, 'auth');
+  assert.equal(world.fake.discoveredDevices.length, 0);
+});
+
+test('readings start again once a refused password is accepted', async (t) => {
+  const world = await createWorld({ timers: false });
+  t.after(() => world.app.stop());
+  world.hub.timersEnabled = true;
+  world.cloud.failures.push({ status: 400, body: { error_code: 9020 } });
+  world.cloud.revokeTokens();
+  await world.hub.poll();
+  assert.equal(world.hub.cloud.error.kind, 'auth');
+  await world.hub.poll();
+  assert.ok(world.hub.pollTimer, 'the timer runs again');
+  clearTimeout(world.hub.pollTimer);
+  world.hub.timersEnabled = false;
+});
+
+test('an offline module is not republished by the heartbeat', async (t) => {
+  const world = await createWorld();
+  t.after(() => world.app.stop());
+  world.cloud.setOnline('onyx', false);
+  await world.hub.poll();
+  const mode = featureId(world, 'onyx', 'mode');
+  const before = world.fake.states.filter((s) => s.device_feature_external_id === mode).length;
+  world.clock.advance(13 * 3_600_000);
+  await world.hub.poll();
+  const after = world.fake.states.filter((s) => s.device_feature_external_id === mode).length;
+  assert.equal(after, before);
+});
+
+test('a vacation starting outside Gladys is not announced as a mode change', async (t) => {
+  const world = await createWorld();
+  t.after(() => world.app.stop());
+  Object.assign(world.cloud.attr('pilote-v2'), { derog_mode: 1, derog_time: 4, mode: 'fro' });
+  await world.hub.poll();
+  assert.equal(world.fake.sceneEvents.filter((e) => e.key === TRIGGERS.MODE_CHANGED).length, 0);
+});

@@ -98,9 +98,11 @@ test('a mode ends the vacation in progress', () => {
 
 test('a Glow stops with on_off and starts again with its mode', () => {
   const glow = parse('glow');
-  assert.deepEqual(modeCommand(glow, PILOT_WIRE.OFF), { attrs: { on_off: 0 } });
-  assert.deepEqual(modeCommand(glow, PILOT_WIRE.COMFORT), { attrs: { mode: 'cft', on_off: 1 } });
-  assert.equal(applyCommand(glow, { attrs: { on_off: 0 } }).mode, PILOT_WIRE.OFF);
+  assert.deepEqual(modeCommand(glow, PILOT_WIRE.OFF), { attrs: { on_off: false } });
+  assert.deepEqual(modeCommand(glow, PILOT_WIRE.COMFORT), {
+    attrs: { mode: 'cft', on_off: true },
+  });
+  assert.equal(applyCommand(glow, { attrs: { on_off: false } }).mode, PILOT_WIRE.OFF);
 });
 
 test('vacation, child lock and programme commands', () => {
@@ -115,4 +117,18 @@ test('vacation, child lock and programme commands', () => {
   assert.equal(next.derogation, 1);
   assert.equal(next.derogationTime, 7);
   assert.equal(next.lock, 1);
+});
+
+test('a mode turns the weekly programme off, so that it sticks', () => {
+  // The Bloom of the fixtures follows its programme (timer_switch 1).
+  assert.deepEqual(modeCommand(parse('bloom'), PILOT_WIRE.FROST_PROTECTION), {
+    attrs: { mode: 'fro', timer_switch: 0 },
+  });
+  const next = applyCommand(parse('bloom'), { attrs: { mode: 'fro', timer_switch: 0 } });
+  assert.equal(next.programming, 0);
+});
+
+test('the Pilote Pro mode is not assumed before the confirming reading', () => {
+  const pro = parse('pilote-pro');
+  assert.equal(applyCommand(pro, { attrs: { mode: 'eco' } }).mode, pro.mode);
 });

@@ -18,8 +18,8 @@ desconecta.
 ## Lo que necesita
 
 - Gladys Assistant 5.1.0 o posterior.
-- Una **cuenta Heatzy** (la dirección de correo y la contraseña de la
-  aplicación Heatzy), con sus módulos ya instalados en la aplicación.
+- Una **cuenta Heatzy** (la dirección de correo y la contraseña de la aplicación
+  Heatzy), con sus módulos ya instalados en la aplicación.
 - Una conexión a Internet: los módulos solo son accesibles a través de la nube
   de Heatzy (Gizwits), no existe una API local.
 
@@ -63,9 +63,9 @@ Bloom: los demás módulos los rechazan con un mensaje. La insignia del
 dispositivo indica **Nube** mientras el módulo está conectado a la nube de
 Heatzy e **Inaccesible** cuando está desconectado.
 
-Las consignas de confort y eco de los Glow, Onyx, Inea, Bloom y Pilote Pro no
-se muestran: Gladys, HomeKit y los asistentes de voz tomarían una consigna por
-un termostato, y un hilo piloto no lo es. Ajústelas en la aplicación Heatzy.
+Las consignas de confort y eco de los Glow, Onyx, Inea, Bloom y Pilote Pro no se
+muestran: Gladys, HomeKit y los asistentes de voz tomarían una consigna por un
+termostato, y un hilo piloto no lo es. Ajústelas en la aplicación Heatzy.
 
 ## Panel
 
@@ -89,8 +89,8 @@ están en él. Confort -1°C y -2°C están en el selector del dispositivo.
   programación o un botón del módulo ha cambiado el modo de un radiador.
   Filtros: el radiador, el nuevo modo. Variables: nombre y dispositivo del
   radiador, nuevo modo, modo anterior (`comfort`, `comfort_1`, `comfort_2`,
-  `eco`, `frost_protection`, `off`), programación activa. Los cambios hechos
-  por Gladys no se anuncian (una escena que reaccionara a ellos podría entrar en
+  `eco`, `frost_protection`, `off`), programación activa. Los cambios hechos por
+  Gladys no se anuncian (una escena que reaccionara a ellos podría entrar en
   bucle); el desencadenante de dispositivo de Gladys sobre la función _Modo hilo
   piloto_ ve todos los cambios.
 - **Módulo Heatzy desconectado**: un módulo ha perdido la conexión con la nube
@@ -101,9 +101,10 @@ están en él. Confort -1°C y -2°C están en el selector del dispositivo.
 ### Acciones
 
 - **Poner radiadores Heatzy en un modo**: un radiador, o todos si el radiador se
-  deja vacío. Unas vacaciones en curso se terminan. En todos los radiadores,
-  Confort -1°C y -2°C omiten los módulos que no los tienen. Salida: el número de
-  módulos que han aceptado.
+  deja vacío. Unas vacaciones en curso se terminan, y la programación semanal se
+  desactiva para que el modo se mantenga. En todos los radiadores, Confort -1°C
+  y -2°C omiten los módulos que no los tienen. Salida: el número de módulos que
+  han aceptado.
 - **Iniciar el modo vacaciones de Heatzy**: antihielo durante 1 a 255 días;
   después el módulo vuelve a su programación. No en el Pilote v1.
 - **Terminar el modo vacaciones de Heatzy**: termina las vacaciones (o un boost
@@ -118,9 +119,8 @@ función _Modo hilo piloto_ también funciona.
   todos los radiadores, **Eco**; al volver: **Confort**.
 - **Ventana abierta** (sensor de apertura de la habitación): poner ese radiador
   en **Antihielo**; cerrada de nuevo: **Confort**.
-- **Un módulo desconectado por la noche**: _Módulo Heatzy desconectado_ →
-  enviar un mensaje: «El radiador {{triggerEvent.data.radiator}} está
-  desconectado».
+- **Un módulo desconectado por la noche**: _Módulo Heatzy desconectado_ → enviar
+  un mensaje: «El radiador {{triggerEvent.data.radiator}} está desconectado».
 
 ## Solución de problemas
 
@@ -132,9 +132,9 @@ función _Modo hilo piloto_ también funciona.
   integración espera diez minutos. Elija un intervalo más largo si vuelve a
   ocurrir.
 - **Un radiador no cambia de modo**: compruebe que el módulo está conectado en
-  la aplicación Heatzy. Con la programación activada, la programación retoma el
-  control en su siguiente franja: desactive la _Programación semanal_ para
-  mantener un modo.
+  la aplicación Heatzy. Un modo elegido en Gladys desactiva la _Programación
+  semanal_ para que se mantenga: vuelva a activarla para volver a la
+  programación.
 - **Un modo se muestra con unos minutos de retraso**: los cambios hechos fuera
   de Gladys se ven en la lectura siguiente (el intervalo de actualización).
 - **Más detalles**: los registros de la integración (Ajustes → Integraciones →

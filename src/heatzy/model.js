@@ -11,7 +11,7 @@
 //   - every later module: `mode` is cft, eco, fro, stop, and cft1 / cft2
 //     (comfort -1 / -2 °C) on the modules that have them; a command sends
 //     `{ attrs: { mode } }`.
-// Glow, Onyx and Inea stop with `on_off: 0` and keep their last mode; the
+// Glow, Onyx and Inea stop with `on_off: false` and keep their last mode; the
 // Pilote Pro reports the mode it is applying in `cur_mode`.
 // -----------------------------------------------------------------------------
 
@@ -255,7 +255,10 @@ export class UnsupportedCommand extends Error {
 /**
  * Control payload (/app/control/<did>) that puts a module in a pilot-wire mode.
  * A derogation in progress (vacation, boost) is ended, as hass-heatzy does,
- * otherwise the module would ignore the new mode until it expires.
+ * otherwise the module would ignore the new mode until it expires. The weekly
+ * programme is turned off too (hass-heatzy does it on turn on / off): a mode
+ * chosen in Gladys, Off or Frost protection above all, must stick instead of
+ * being replaced at the next slot of the programme.
  */
 export function modeCommand(module, mode) {
   const { capabilities } = module;
@@ -266,17 +269,21 @@ export function modeCommand(module, mode) {
     return { raw: [1, 1, V1_RAW[mode]] };
   }
   const attrs = {};
+  // A boolean, as hass-heatzy sends it (the Glow Simple reports one).
   if (capabilities.onOff && mode === PILOT_WIRE.OFF) {
-    attrs.on_off = 0;
+    attrs.on_off = false;
   } else {
     attrs.mode = MODE_TO_CODE[mode];
     if (capabilities.onOff) {
-      attrs.on_off = 1;
+      attrs.on_off = true;
     }
   }
   if (module.derogation) {
     attrs.derog_mode = DEROGATION.NONE;
     attrs.derog_time = 0;
+  }
+  if (capabilities.programming && module.programming === 1) {
+    attrs[capabilities.programming] = 0;
   }
   return { attrs };
 }
@@ -311,10 +318,12 @@ export function applyCommand(module, payload) {
   }
   const { attrs } = payload;
   const next = { ...module };
-  if ('mode' in attrs) {
+  // The Pilote Pro reports the mode it applies, not the one asked (an open
+  // window keeps it off): wait for the confirming reading there.
+  if ('mode' in attrs && !module.capabilities.modeAttribute) {
     next.mode = CODE_TO_MODE[attrs.mode];
   }
-  if (attrs.on_off === 0) {
+  if (attrs.on_off === false) {
     next.mode = PILOT_WIRE.OFF;
   }
   if ('derog_mode' in attrs) {

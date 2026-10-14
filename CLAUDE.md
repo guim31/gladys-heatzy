@@ -265,3 +265,9 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
   un seul publié. Ne jamais mettre d'effet de bord à droite d'un `||=`.
 - Mot de passe refusé : plus aucune lecture jusqu'à une nouvelle configuration ou « Tester la
   connexion » (ne pas faire bloquer le compte). 429 / 9999 : pause de 10 min.
+- **Un mode choisi dans Gladys éteint la programmation** (`timer_switch: 0`, comme le turn on/off de
+  hass-heatzy) : sinon Off ou Hors gel sont remplacés au créneau suivant. Glow : `on_off` envoyé en
+  **booléen** (la Glow Simple le rapporte ainsi, hass-heatzy envoie True/False).
+- Une erreur de cloud (auth, quota, panne) pendant la lecture d'un module **arrête la lecture** :
+  continuer les requêtes suivantes ignorerait le quota. Un module hors ligne n'est pas republié par
+  le heartbeat (ses valeurs ne doivent pas paraître fraîches).

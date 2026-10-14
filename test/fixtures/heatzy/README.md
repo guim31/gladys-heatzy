@@ -20,3 +20,6 @@ untouched.
 | glow.json       | Glow Simple   | `2fd622e45283470f9e27e8e6167d7533` |
 | onyx.json       | Onyx          | `bb10d064f8de409db633b750faa22a52` |
 | bloom.json      | Bloom         | `480253852d574f11b2d7fbf4460d7a41` |
+
+`real/`: answers of the real Gizwits cloud, captured on 14/10/2026 from the
+locked container with an invented account (no real account was used).
