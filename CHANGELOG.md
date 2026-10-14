@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-14
+
 ### Added
 
 - Heatzy pilot wire modules through the Heatzy cloud (Pilote v1 to v4, Pilote
@@ -27,4 +29,5 @@ the notes of the version's GitHub Release.
   from 1 to 10 minutes; texts and documentation in English, French, German and
   Spanish.
 
-[Unreleased]: https://github.com/guim31/gladys-heatzy/commits/main
+[Unreleased]: https://github.com/guim31/gladys-heatzy/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-heatzy/releases/tag/v1.0.0
