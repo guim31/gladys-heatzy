@@ -1,6 +1,6 @@
 {
   "name": "gladys-heatzy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Gladys Assistant integration for Heatzy pilot wire modules (Pilote, Glow, Onyx, Bloom...).",
   "type": "module",
